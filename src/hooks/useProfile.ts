@@ -37,40 +37,40 @@ export const useProfile = () => {
   const fetchProfile = async () => {
     try {
       setLoading(true);
+      setError(null);
+      
       const { data, error } = await supabase
         .from('user_profiles')
         .select('*')
         .eq('id', user?.id)
-        .single();
-
-      if (error && error.code === 'PGRST116') {
-        // Profile doesn't exist, create a basic one
-        await createBasicProfile();
-        return;
-      }
+        .maybeSingle();
 
       if (error) {
         throw error;
       }
 
-      if (data) {
-        setProfile({
-          id: data.id,
-          firstName: data.first_name,
-          lastName: data.last_name,
-          dateOfBirth: data.date_of_birth,
-          gender: data.gender,
-          heightCm: data.height_cm,
-          weightKg: data.weight_kg,
-          activityLevel: data.activity_level,
-          healthGoals: data.health_goals,
-          dietaryRestrictions: data.dietary_restrictions,
-          medicalConditions: data.medical_conditions,
-          onboardingCompleted: data.onboarding_completed,
-          createdAt: data.created_at,
-          updatedAt: data.updated_at,
-        });
+      if (!data) {
+        // Profile doesn't exist, create a basic one
+        await createBasicProfile();
+        return;
       }
+
+      setProfile({
+        id: data.id,
+        firstName: data.first_name,
+        lastName: data.last_name,
+        dateOfBirth: data.date_of_birth,
+        gender: data.gender,
+        heightCm: data.height_cm,
+        weightKg: data.weight_kg,
+        activityLevel: data.activity_level,
+        healthGoals: data.health_goals,
+        dietaryRestrictions: data.dietary_restrictions,
+        medicalConditions: data.medical_conditions,
+        onboardingCompleted: data.onboarding_completed,
+        createdAt: data.created_at,
+        updatedAt: data.updated_at,
+      });
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -86,6 +86,9 @@ export const useProfile = () => {
         health_goals: [],
         dietary_restrictions: [],
         medical_conditions: [],
+        lifestyle_factors: [],
+        allergies: [],
+        medications: [],
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       };

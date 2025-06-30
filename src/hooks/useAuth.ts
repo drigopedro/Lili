@@ -72,7 +72,7 @@ export const useAuth = (): AuthState & {
   const signUp = async (email: string, password: string) => {
     setState(prev => ({ ...prev, loading: true, error: null }));
     
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
     });
@@ -81,6 +81,39 @@ export const useAuth = (): AuthState & {
       setState(prev => ({ ...prev, loading: false, error: error.message }));
       throw error;
     }
+
+    // Create user profile immediately after successful signup
+    if (data.user) {
+      try {
+        const basicProfileData = {
+          id: data.user.id,
+          onboarding_completed: false,
+          health_goals: [],
+          dietary_restrictions: [],
+          medical_conditions: [],
+          lifestyle_factors: [],
+          allergies: [],
+          medications: [],
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        };
+
+        const { error: profileError } = await supabase
+          .from('user_profiles')
+          .insert(basicProfileData);
+
+        if (profileError) {
+          console.error('Failed to create user profile:', profileError);
+          // Don't throw here as the user account was created successfully
+          // The profile will be created later in useProfile hook if needed
+        }
+      } catch (profileErr) {
+        console.error('Error creating user profile:', profileErr);
+        // Don't throw here as the user account was created successfully
+      }
+    }
+
+    setState(prev => ({ ...prev, loading: false }));
   };
 
   const signOut = async () => {
