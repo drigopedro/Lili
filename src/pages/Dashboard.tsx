@@ -109,6 +109,17 @@ export const Dashboard: React.FC = () => {
         </div>
 
         <div className="container-mobile py-6 space-y-6">
+          {/* Bolt.new Badge */}
+          <div className="flex justify-center mb-4">
+            <a href="https://bolt.new" target="_blank" rel="noopener noreferrer">
+              <img 
+                src="https://raw.githubusercontent.com/kickiniteasy/bolt-hackathon-badge/main/white-circle.svg" 
+                alt="Built with Bolt.new" 
+                className="w-24 h-24"
+              />
+            </a>
+          </div>
+
           {/* Quick Stats */}
           <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
             {quickStats.map((stat, index) => (
