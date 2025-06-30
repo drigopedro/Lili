@@ -73,6 +73,21 @@ class MealPlanningService {
       query = query.not('tags', 'cs', `{${preferences.dietary_restrictions.join(',')}}`);
     }
 
+    // Filter by allergies
+    if (preferences.allergies.length > 0) {
+      query = query.not('tags', 'cs', `{${preferences.allergies.join(',')}}`);
+    }
+
+    // Filter by cuisine preferences if specified
+    if (preferences.cuisine_preferences && preferences.cuisine_preferences.length > 0) {
+      // Use the overlaps operator to find recipes with matching cuisine tags
+      query = query.or(
+        preferences.cuisine_preferences.map(cuisine => 
+          `tags.cs.{${cuisine}}`
+        ).join(',')
+      );
+    }
+
     const { data: recipes, error } = await query.limit(50);
     
     if (error) throw error;
@@ -385,9 +400,9 @@ class MealPlanningService {
         .eq('is_active', true)
         .order('created_at', { ascending: false })
         .limit(1)
-        .single();
+        .maybeSingle();
 
-      if (error && error.code !== 'PGRST116') throw error;
+      if (error) throw error;
       if (!mealPlan) return null;
 
       // Transform database data to WeeklyMealPlan format

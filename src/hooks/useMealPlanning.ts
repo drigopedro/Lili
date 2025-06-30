@@ -2,7 +2,9 @@ import { useState, useEffect } from 'react';
 import { mealPlanningService } from '../services/mealPlanningService';
 import { useAuth } from './useAuth';
 import { useProfile } from './useProfile';
+import { useSettings } from './useSettings';
 import type { WeeklyMealPlan, MealPlanningPreferences } from '../types/meal-planning';
+import type { MealPreferences } from '../types/onboarding';
 
 export const useMealPlanning = () => {
   const [currentMealPlan, setCurrentMealPlan] = useState<WeeklyMealPlan | null>(null);
@@ -10,6 +12,7 @@ export const useMealPlanning = () => {
   const [error, setError] = useState<string | null>(null);
   const { user } = useAuth();
   const { profile } = useProfile();
+  const { mealPlanningSettings } = useSettings();
 
   useEffect(() => {
     if (user) {
@@ -39,12 +42,15 @@ export const useMealPlanning = () => {
         throw new Error('User profile not found');
       }
 
+      // Get meal preferences from settings
+      const cookingTimeLimit = getCookingTimeLimit(mealPlanningSettings?.cooking_time_preference);
+      
       const preferences: MealPlanningPreferences = {
         dietary_restrictions: profile.dietaryRestrictions || [],
-        allergies: profile.dietaryRestrictions || [], // Using dietary restrictions as allergies for now
-        cuisine_preferences: [], // Would come from meal preferences
-        cooking_time_limit: 60, // Default 1 hour
-        budget_range: 'medium',
+        allergies: profile.allergies || [],
+        cuisine_preferences: mealPlanningSettings?.preferred_cuisines || [],
+        cooking_time_limit: cookingTimeLimit,
+        budget_range: mealPlanningSettings?.budget_range || 'medium',
         calorie_target: 2000, // Would calculate based on user profile
         protein_target: 150,
         carb_target: 250,
@@ -65,6 +71,21 @@ export const useMealPlanning = () => {
       throw err;
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Helper function to convert cooking time preference to minutes
+  const getCookingTimeLimit = (preference?: string): number => {
+    switch (preference) {
+      case 'quick':
+        return 30; // 30 minutes
+      case 'moderate':
+        return 60; // 1 hour
+      case 'long':
+        return 120; // 2 hours
+      case 'any':
+      default:
+        return 180; // 3 hours (essentially no limit)
     }
   };
 
