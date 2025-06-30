@@ -55,7 +55,7 @@ export const useOnboarding = () => {
 
       const progressData = {
         user_id: user?.id,
-        current_step: step,
+        current_step: step + 1,
         completed_steps: progress?.completedSteps.includes(step) 
           ? progress.completedSteps 
           : [...(progress?.completedSteps || []), step],
