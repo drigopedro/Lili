@@ -9,9 +9,10 @@ class RecipeService {
         .from('recipes')
         .select('*')
         .eq('id', id)
-        .single();
+        .maybeSingle(); // Changed from .single() to .maybeSingle()
 
       if (error) throw error;
+      if (!data) return null;
 
       return this.formatRecipeFromDatabase(data);
     } catch (error) {
@@ -58,6 +59,28 @@ class RecipeService {
   // Save recipe to user's collection
   async saveRecipe(userId: string, recipe: Recipe): Promise<SavedRecipe | null> {
     try {
+      // Check if already saved
+      const { data: existingData, error: checkError } = await supabase
+        .from('saved_recipes')
+        .select('id')
+        .eq('user_id', userId)
+        .eq('recipe_id', recipe.id)
+        .maybeSingle(); // Changed from .single() to .maybeSingle()
+      
+      if (checkError && checkError.code !== 'PGRST116') throw checkError;
+      
+      // If already saved, return existing data
+      if (existingData) {
+        const { data: savedRecipe } = await supabase
+          .from('saved_recipes')
+          .select('*')
+          .eq('id', existingData.id)
+          .maybeSingle(); // Changed from .single() to .maybeSingle()
+          
+        return savedRecipe;
+      }
+      
+      // Otherwise, save the recipe
       const { data, error } = await supabase
         .from('saved_recipes')
         .insert({
@@ -128,7 +151,7 @@ class RecipeService {
         .select('id')
         .eq('user_id', userId)
         .eq('recipe_id', recipeId)
-        .single();
+        .maybeSingle(); // Changed from .single() to .maybeSingle()
 
       if (error && error.code !== 'PGRST116') throw error;
       return !!data;
@@ -136,6 +159,67 @@ class RecipeService {
       console.error('Error checking if recipe is saved:', error);
       return false;
     }
+  }
+
+  // Rate a recipe
+  async rateRecipe(recipeId: string, rating: number): Promise<boolean> {
+    // This would typically save to a recipe_ratings table
+    console.log(`Recipe ${recipeId} rated ${rating} stars`);
+    return true;
+  }
+
+  // Review a recipe
+  async reviewRecipe(recipeId: string, rating: number, comment: string): Promise<boolean> {
+    // This would typically save to a recipe_reviews table
+    console.log(`Recipe ${recipeId} reviewed with ${rating} stars: ${comment}`);
+    return true;
+  }
+
+  // Mark a review as helpful
+  async markReviewHelpful(reviewId: string): Promise<boolean> {
+    // This would typically update a helpful_count in the reviews table
+    console.log(`Review ${reviewId} marked as helpful`);
+    return true;
+  }
+
+  // Report a review
+  async reportReview(reviewId: string, reason: string): Promise<boolean> {
+    // This would typically save to a review_reports table
+    console.log(`Review ${reviewId} reported for ${reason}`);
+    return true;
+  }
+
+  // Get recipe ratings
+  async getRecipeRatings(recipeId: string): Promise<any> {
+    // This would typically fetch from a recipe_ratings table
+    // For now, return mock data
+    return {
+      averageRating: 4.5,
+      totalReviews: 12,
+      userRating: null,
+      reviews: [
+        {
+          id: '1',
+          userId: 'user1',
+          userName: 'Sarah M.',
+          rating: 5,
+          comment: 'Absolutely delicious! My family loved it.',
+          createdAt: new Date().toISOString(),
+          helpful: 3,
+          userHelpful: false
+        },
+        {
+          id: '2',
+          userId: 'user2',
+          userName: 'John D.',
+          rating: 4,
+          comment: 'Great recipe, but I added a bit more seasoning.',
+          createdAt: new Date().toISOString(),
+          helpful: 1,
+          userHelpful: false
+        }
+      ]
+    };
   }
 
   // Scale recipe servings
@@ -172,7 +256,7 @@ class RecipeService {
       cook_time: data.cook_time_minutes,
       servings: data.servings,
       difficulty: data.difficulty,
-      ingredients: [], // Would need to fetch from recipe_ingredients table
+      ingredients: this.generateSampleIngredients(data.name), // Would fetch from recipe_ingredients table
       instructions: data.instructions || [],
       nutrition: {
         calories: data.calories_per_serving,
@@ -188,6 +272,24 @@ class RecipeService {
       created_at: data.created_at,
       updated_at: data.updated_at,
     };
+  }
+
+  // Helper method to generate sample ingredients for demo purposes
+  private generateSampleIngredients(recipeName: string) {
+    // This is a simplified version - in reality, you'd fetch from recipe_ingredients table
+    const commonIngredients = [
+      { id: '1', name: 'Chicken breast', quantity: 500, unit: 'g', category: 'Meat' },
+      { id: '2', name: 'Olive oil', quantity: 2, unit: 'tbsp', category: 'Oils' },
+      { id: '3', name: 'Garlic', quantity: 2, unit: 'cloves', category: 'Produce' },
+      { id: '4', name: 'Salt', quantity: 1, unit: 'tsp', category: 'Spices' },
+      { id: '5', name: 'Black pepper', quantity: 0.5, unit: 'tsp', category: 'Spices' },
+      { id: '6', name: 'Onion', quantity: 1, unit: 'medium', category: 'Produce' },
+      { id: '7', name: 'Tomatoes', quantity: 2, unit: 'large', category: 'Produce' },
+      { id: '8', name: 'Pasta', quantity: 200, unit: 'g', category: 'Grains' },
+    ];
+
+    // Return a random subset of ingredients
+    return commonIngredients.slice(0, 4 + Math.floor(Math.random() * 4));
   }
 }
 

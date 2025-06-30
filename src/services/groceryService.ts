@@ -106,6 +106,32 @@ class GroceryService {
     }
   }
 
+  // Get a specific grocery list
+  async getGroceryList(listId: string): Promise<GroceryList | null> {
+    try {
+      const { data, error } = await supabase
+        .from('grocery_lists')
+        .select('*')
+        .eq('id', listId)
+        .maybeSingle(); // Changed from .single() to .maybeSingle()
+
+      if (error) throw error;
+      if (!data) return null;
+
+      return {
+        id: data.id,
+        user_id: data.user_id,
+        meal_plan_id: data.meal_plan_id,
+        items: data.items || [],
+        estimated_cost: data.estimated_cost || 0,
+        created_at: data.created_at,
+      };
+    } catch (error) {
+      console.error('Error fetching grocery list:', error);
+      return null;
+    }
+  }
+
   // Update grocery list item
   async updateGroceryItem(listId: string, itemId: string, updates: Partial<GroceryItem>): Promise<boolean> {
     try {
@@ -114,9 +140,10 @@ class GroceryService {
         .from('grocery_lists')
         .select('items')
         .eq('id', listId)
-        .single();
+        .maybeSingle(); // Changed from .single() to .maybeSingle()
 
       if (fetchError) throw fetchError;
+      if (!currentList) return false;
 
       const items = currentList.items || [];
       const itemIndex = items.findIndex((item: GroceryItem) => item.id === itemId);
