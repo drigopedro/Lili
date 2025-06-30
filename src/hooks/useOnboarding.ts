@@ -22,9 +22,9 @@ export const useOnboarding = () => {
         .from('onboarding_progress')
         .select('*')
         .eq('user_id', user?.id)
-        .single();
+        .maybeSingle();
 
-      if (error && error.code !== 'PGRST116') {
+      if (error) {
         throw error;
       }
 
@@ -68,7 +68,9 @@ export const useOnboarding = () => {
 
       const { data, error } = await supabase
         .from('onboarding_progress')
-        .upsert(progressData)
+        .upsert(progressData, {
+          onConflict: 'user_id'
+        })
         .select()
         .single();
 
@@ -120,7 +122,9 @@ export const useOnboarding = () => {
 
       const { error: profileError } = await supabase
         .from('user_profiles')
-        .upsert(profileData);
+        .upsert(profileData, {
+          onConflict: 'id'
+        });
 
       if (profileError) throw profileError;
 
@@ -138,7 +142,9 @@ export const useOnboarding = () => {
 
       const { error: preferencesError } = await supabase
         .from('meal_preferences')
-        .upsert(preferencesData);
+        .upsert(preferencesData, {
+          onConflict: 'user_id'
+        });
 
       if (preferencesError) throw preferencesError;
 
