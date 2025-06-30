@@ -1,0 +1,124 @@
+{
+  "name": "Lili - Nutrition Therapy",
+  "short_name": "Lili",
+  "description": "Your personal guide to eating well with AI-powered meal planning and nutrition tracking",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#331442",
+  "theme_color": "#331442",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "lang": "en-GB",
+  "dir": "ltr",
+  "categories": ["health", "lifestyle", "food", "productivity"],
+  "icons": [
+    {
+      "src": "/Lili-logo.png",
+      "sizes": "72x72",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/Lili-logo.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/Lili-logo.png",
+      "sizes": "128x128",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/Lili-logo.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/Lili-logo.png",
+      "sizes": "152x152",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/Lili-logo.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/Lili-logo.png",
+      "sizes": "384x384",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/Lili-logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Today's Meals",
+      "short_name": "Today",
+      "description": "View today's meal plan",
+      "url": "/meal-planning?tab=today",
+      "icons": [
+        {
+          "src": "/Lili-logo.png",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "Recipes",
+      "short_name": "Recipes",
+      "description": "Browse and search recipes",
+      "url": "/recipes",
+      "icons": [
+        {
+          "src": "/Lili-logo.png",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "Shopping List",
+      "short_name": "Shopping",
+      "description": "View grocery shopping list",
+      "url": "/grocery",
+      "icons": [
+        {
+          "src": "/Lili-logo.png",
+          "sizes": "96x96"
+        }
+      ]
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/Lili-logo.png",
+      "sizes": "540x720",
+      "type": "image/png",
+      "form_factor": "narrow"
+    },
+    {
+      "src": "/Lili-logo.png",
+      "sizes": "720x540",
+      "type": "image/png",
+      "form_factor": "wide"
+    }
+  ],
+  "prefer_related_applications": false,
+  "related_applications": [],
+  "edge_side_panel": {
+    "preferred_width": 400
+  },
+  "launch_handler": {
+    "client_mode": "navigate-existing"
+  }
+}

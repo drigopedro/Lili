@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/png" href="/Lili-logo.png" />
+    
+    <!-- Mobile-first viewport configuration -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no" />
+    
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#331442" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Lili" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    
+    <!-- iOS Splash Screens -->
+    <meta name="apple-touch-fullscreen" content="yes" />
+    <link rel="apple-touch-icon" href="/Lili-logo.png" />
+    <link rel="apple-touch-startup-image" href="/Lili-logo.png" />
+    
+    <!-- Manifest -->
+    <link rel="manifest" href="/manifest.json" />
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Your personal guide to eating well with AI-powered meal planning, nutrition tracking, and recipe recommendations." />
+    <meta name="keywords" content="nutrition, meal planning, recipes, health, diet, wellness" />
+    <meta name="author" content="Lili Nutrition" />
+    
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="Lili - Your Personal Guide to Eating Well" />
+    <meta property="og:description" content="AI-powered meal planning and nutrition tracking for a healthier lifestyle." />
+    <meta property="og:image" content="/Lili-logo.png" />
+    <meta property="og:url" content="https://lili-nutrition.app" />
+    <meta property="og:type" content="website" />
+    
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Lili - Your Personal Guide to Eating Well" />
+    <meta name="twitter:description" content="AI-powered meal planning and nutrition tracking for a healthier lifestyle." />
+    <meta name="twitter:image" content="/Lili-logo.png" />
+    
+    <!-- Performance Optimization -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com">
+    <link rel="dns-prefetch" href="https://fonts.gstatic.com">
+    
+    <!-- Critical CSS for fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Preload critical resources -->
+    <link rel="preload" href="/Lili-logo.png" as="image" type="image/png" />
+    
+    <!-- Security Headers -->
+    <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+    <meta http-equiv="X-Frame-Options" content="DENY" />
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block" />
+    
+    <title>Lili - Your Personal Guide to Eating Well</title>
+    
+    <!-- Critical CSS for initial render -->
+    <style>
+      /* Critical CSS for above-the-fold content */
+      html {
+        height: 100%;
+        height: -webkit-fill-available;
+      }
+      
+      body {
+        margin: 0;
+        padding: 0;
+        background-color: #331442;
+        color: white;
+        font-family: 'Sora', system-ui, sans-serif;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        height: 100%;
+        height: -webkit-fill-available;
+        overflow-x: hidden;
+        -webkit-tap-highlight-color: transparent;
+        -webkit-touch-callout: none;
+        touch-action: manipulation;
+      }
+      
+      #root {
+        height: 100%;
+        height: -webkit-fill-available;
+      }
+      
+      /* Loading spinner for initial load */
+      .initial-loader {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: #331442;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+      }
+      
+      .loader-spinner {
+        width: 40px;
+        height: 40px;
+        border: 3px solid rgba(141, 206, 186, 0.3);
+        border-top: 3px solid #8DCEBA;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+      
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+      
+      /* Hide loader when app loads */
+      .app-loaded .initial-loader {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Initial loading screen -->
+    <div class="initial-loader">
+      <div class="loader-spinner"></div>
+    </div>
+    
+    <div id="root"></div>
+    
+    <!-- Service Worker Registration -->
+    <script>
+      // Remove initial loader when app loads
+      window.addEventListener('load', () => {
+        document.body.classList.add('app-loaded');
+      });
+      
+      // Register service worker
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js')
+            .then((registration) => {
+              console.log('SW registered: ', registration);
+            })
+            .catch((registrationError) => {
+              console.log('SW registration failed: ', registrationError);
+            });
+        });
+      }
+      
+      // Set CSS custom property for viewport height
+      function setVH() {
+        const vh = window.innerHeight * 0.01;
+        document.documentElement.style.setProperty('--vh', `${vh}px`);
+      }
+      
+      setVH();
+      window.addEventListener('resize', setVH);
+      window.addEventListener('orientationchange', setVH);
+      
+      // Prevent zoom on double tap for iOS
+      let lastTouchEnd = 0;
+      document.addEventListener('touchend', function (event) {
+        const now = (new Date()).getTime();
+        if (now - lastTouchEnd <= 300) {
+          event.preventDefault();
+        }
+        lastTouchEnd = now;
+      }, false);
+      
+      // Prevent pinch zoom
+      document.addEventListener('gesturestart', function (e) {
+        e.preventDefault();
+      });
+      
+      document.addEventListener('gesturechange', function (e) {
+        e.preventDefault();
+      });
+      
+      document.addEventListener('gestureend', function (e) {
+        e.preventDefault();
+      });
+    </script>
+    
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
