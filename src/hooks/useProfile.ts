@@ -43,7 +43,13 @@ export const useProfile = () => {
         .eq('id', user?.id)
         .single();
 
-      if (error && error.code !== 'PGRST116') {
+      if (error && error.code === 'PGRST116') {
+        // Profile doesn't exist, create a basic one
+        await createBasicProfile();
+        return;
+      }
+
+      if (error) {
         throw error;
       }
 
@@ -69,6 +75,50 @@ export const useProfile = () => {
       setError(err.message);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const createBasicProfile = async () => {
+    try {
+      const basicProfileData = {
+        id: user?.id,
+        onboarding_completed: false,
+        health_goals: [],
+        dietary_restrictions: [],
+        medical_conditions: [],
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      };
+
+      const { data, error } = await supabase
+        .from('user_profiles')
+        .insert(basicProfileData)
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      if (data) {
+        setProfile({
+          id: data.id,
+          firstName: data.first_name,
+          lastName: data.last_name,
+          dateOfBirth: data.date_of_birth,
+          gender: data.gender,
+          heightCm: data.height_cm,
+          weightKg: data.weight_kg,
+          activityLevel: data.activity_level,
+          healthGoals: data.health_goals,
+          dietaryRestrictions: data.dietary_restrictions,
+          medicalConditions: data.medical_conditions,
+          onboardingCompleted: data.onboarding_completed,
+          createdAt: data.created_at,
+          updatedAt: data.updated_at,
+        });
+      }
+    } catch (err: any) {
+      setError(err.message);
+      throw err;
     }
   };
 
