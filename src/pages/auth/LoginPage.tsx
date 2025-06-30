@@ -39,7 +39,8 @@ export const LoginPage: React.FC = () => {
 
     try {
       await signIn(email, password);
-      navigate('/dashboard');
+      // After successful login, the App component's routing logic will handle
+      // redirecting to either the onboarding flow or dashboard based on the user's profile
     } catch (error: any) {
       setErrors({ general: error.message || 'Failed to sign in' });
     }

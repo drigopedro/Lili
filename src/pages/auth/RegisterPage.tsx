@@ -58,6 +58,8 @@ export const RegisterPage: React.FC = () => {
 
     try {
       await signUp(formData.email, formData.password);
+      // After successful registration, the App component's routing logic will handle
+      // redirecting to the onboarding flow
       navigate('/onboarding');
     } catch (error: any) {
       setErrors({ general: error.message || 'Failed to create account' });

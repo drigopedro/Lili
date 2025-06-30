@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './hooks/useAuth';
+import { useProfile } from './hooks/useProfile';
 import { LoadingSpinner } from './components/ui/LoadingSpinner';
 import { BottomNavigation } from './components/ui/BottomNavigation';
 import { PWAInstallPrompt } from './components/ui/PWAInstallPrompt';
@@ -20,7 +21,10 @@ import { OnboardingFlow } from './components/onboarding/OnboardingFlow';
 
 // Protected Route Component
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { user, loading } = useAuth();
+  const { user, loading: authLoading } = useAuth();
+  const { profile, loading: profileLoading } = useProfile();
+
+  const loading = authLoading || profileLoading;
 
   if (loading) {
     return (
@@ -30,12 +34,24 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) =
     );
   }
 
-  return user ? <>{children}</> : <Navigate to="/auth/login" replace />;
+  if (!user) {
+    return <Navigate to="/auth/login" replace />;
+  }
+
+  // If user is authenticated but hasn't completed onboarding, redirect to onboarding
+  if (user && profile && !profile.onboardingCompleted) {
+    return <Navigate to="/onboarding" replace />;
+  }
+
+  return <>{children}</>;
 };
 
 // Public Route Component (redirect if authenticated)
 const PublicRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { user, loading } = useAuth();
+  const { user, loading: authLoading } = useAuth();
+  const { profile, loading: profileLoading } = useProfile();
+
+  const loading = authLoading || profileLoading;
 
   if (loading) {
     return (
@@ -45,7 +61,17 @@ const PublicRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     );
   }
 
-  return user ? <Navigate to="/dashboard" replace /> : <>{children}</>;
+  // If user is authenticated and has completed onboarding, redirect to dashboard
+  if (user && profile?.onboardingCompleted) {
+    return <Navigate to="/dashboard" replace />;
+  }
+
+  // If user is authenticated but hasn't completed onboarding, redirect to onboarding
+  if (user && profile && !profile.onboardingCompleted) {
+    return <Navigate to="/onboarding" replace />;
+  }
+
+  return <>{children}</>;
 };
 
 function App() {
@@ -103,12 +129,12 @@ function App() {
             </PublicRoute>
           } />
           
-          {/* Protected Routes */}
+          {/* Onboarding Route - Special case: accessible when authenticated but not onboarded */}
           <Route path="/onboarding" element={
-            <ProtectedRoute>
-              <OnboardingFlow />
-            </ProtectedRoute>
+            <OnboardingFlow />
           } />
+          
+          {/* Protected Routes */}
           <Route path="/dashboard" element={
             <ProtectedRoute>
               <div className="pb-16 md:pb-0">

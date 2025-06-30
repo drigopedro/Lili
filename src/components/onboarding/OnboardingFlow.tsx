@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useOnboarding } from '../../hooks/useOnboarding';
 import { useProfile } from '../../hooks/useProfile';
+import { useAuth } from '../../hooks/useAuth';
 import { LoadingSpinner } from '../ui/LoadingSpinner';
 import { WelcomeStep } from './WelcomeStep';
 import { AgeGenderStep } from './AgeGenderStep';
@@ -18,12 +19,19 @@ export const OnboardingFlow: React.FC = () => {
   const [currentStep, setCurrentStep] = useState(0);
   const [onboardingData, setOnboardingData] = useState<OnboardingData>({});
   const { progress, updateProgress, completeOnboarding, loading } = useOnboarding();
-  const { profile } = useProfile();
+  const { profile, loading: profileLoading } = useProfile();
+  const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
+    // If user is not authenticated, redirect to login
+    if (!authLoading && !user) {
+      navigate('/auth/login');
+      return;
+    }
+
     // Check if user has already completed onboarding
-    if (profile?.onboardingCompleted) {
+    if (!profileLoading && profile?.onboardingCompleted) {
       navigate('/dashboard');
       return;
     }
@@ -33,7 +41,7 @@ export const OnboardingFlow: React.FC = () => {
       setCurrentStep(progress.currentStep);
       setOnboardingData(progress.stepData);
     }
-  }, [progress, profile, navigate]);
+  }, [progress, profile, user, authLoading, profileLoading, navigate]);
 
   const handleStepComplete = async (stepData: Partial<OnboardingData>) => {
     const updatedData = { ...onboardingData, ...stepData };
@@ -65,12 +73,17 @@ export const OnboardingFlow: React.FC = () => {
     }
   };
 
-  if (loading) {
+  if (loading || authLoading || profileLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#331442' }}>
         <LoadingSpinner size="lg" />
       </div>
     );
+  }
+
+  // If user is not authenticated, don't render anything (redirect will happen in useEffect)
+  if (!user) {
+    return null;
   }
 
   const renderStep = () => {
