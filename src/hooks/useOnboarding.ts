@@ -111,7 +111,7 @@ export const useOnboarding = () => {
         gender: finalData.gender,
         activity_level: finalData.activityLevel,
         health_goals: finalData.healthGoals,
-        dietary_restrictions: finalData.allergies,
+        dietary_restrictions: finalData.dietaryRestrictions,
         medical_conditions: finalData.healthConditions,
         allergies: finalData.allergies,
         medications: finalData.medications,

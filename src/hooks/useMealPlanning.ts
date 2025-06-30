@@ -4,7 +4,6 @@ import { useAuth } from './useAuth';
 import { useProfile } from './useProfile';
 import { useSettings } from './useSettings';
 import type { WeeklyMealPlan, MealPlanningPreferences } from '../types/meal-planning';
-import type { MealPreferences } from '../types/onboarding';
 
 export const useMealPlanning = () => {
   const [currentMealPlan, setCurrentMealPlan] = useState<WeeklyMealPlan | null>(null);
