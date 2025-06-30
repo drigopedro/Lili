@@ -113,7 +113,7 @@ export const Dashboard: React.FC = () => {
           <div className="flex justify-center mb-4">
             <a href="https://bolt.new" target="_blank" rel="noopener noreferrer">
               <img 
-                src="https://raw.githubusercontent.com/kickiniteasy/bolt-hackathon-badge/main/white-circle.svg" 
+                src="/white_circle_360x360.png" 
                 alt="Built with Bolt.new" 
                 className="w-24 h-24"
               />
