@@ -59,6 +59,8 @@ export interface MealPlanningSettings {
   auto_generate_shopping_list: boolean;
   include_snacks: boolean;
   portion_size_preference: 'small' | 'standard' | 'large';
+  preferred_cuisines?: string[]; // Added this field
+  budget_range?: 'low' | 'medium' | 'high' | 'any'; // Added this field
   created_at: string;
   updated_at: string;
 }
