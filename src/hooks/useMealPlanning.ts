@@ -38,23 +38,37 @@ export const useMealPlanning = () => {
       setError(null);
 
       if (!profile) {
-        throw new Error('User profile not found');
+        throw new Error('User profile not found. Please complete your profile setup.');
       }
 
-      // Get meal preferences from settings
-      const cookingTimeLimit = getCookingTimeLimit(mealPlanningSettings?.cooking_time_preference);
-      
+      // Build comprehensive preferences from all sources
       const preferences: MealPlanningPreferences = {
+        // Dietary restrictions from profile
         dietary_restrictions: profile.dietaryRestrictions || [],
-        allergies: profile.allergies || [],
+        
+        // Allergies from profile (extract from medical conditions)
+        allergies: (profile.medicalConditions || [])
+          .filter(condition => condition.toLowerCase().includes('allergy'))
+          .map(condition => condition.replace(/\s*allergy\s*/i, '').trim())
+          .concat(profile.allergies || []),
+        
+        // Cuisine preferences from settings
         cuisine_preferences: mealPlanningSettings?.preferred_cuisines || [],
-        cooking_time_limit: cookingTimeLimit,
+        
+        // Cooking time limit from settings
+        cooking_time_limit: getCookingTimeLimit(mealPlanningSettings?.cooking_time_preference),
+        
+        // Budget range from settings
         budget_range: mealPlanningSettings?.budget_range || 'medium',
-        calorie_target: 2000, // Would calculate based on user profile
+        
+        // Calculate calorie target based on profile
+        calorie_target: calculateCalorieTarget(profile),
         protein_target: 150,
         carb_target: 250,
         fat_target: 67,
       };
+
+      console.log('Generating meal plan with preferences:', preferences);
 
       const weekStart = startDate || new Date().toISOString().split('T')[0];
       const newMealPlan = await mealPlanningService.generateWeeklyMealPlan(
@@ -66,6 +80,7 @@ export const useMealPlanning = () => {
       setCurrentMealPlan(newMealPlan);
       return newMealPlan;
     } catch (err: any) {
+      console.error('Meal plan generation error:', err);
       setError(err.message || 'Failed to generate meal plan');
       throw err;
     } finally {
@@ -84,8 +99,33 @@ export const useMealPlanning = () => {
         return 120; // 2 hours
       case 'any':
       default:
-        return 180; // 3 hours (essentially no limit)
+        return 90; // 1.5 hours default
     }
+  };
+
+  // Calculate calorie target based on user profile
+  const calculateCalorieTarget = (profile: any): number => {
+    // Base calories by activity level
+    const baseCalories = {
+      'sedentary': 1800,
+      'lightly-active': 2000,
+      'moderately-active': 2200,
+      'very-active': 2400,
+      'extremely-active': 2600
+    };
+
+    let target = baseCalories[profile.activityLevel as keyof typeof baseCalories] || 2000;
+
+    // Adjust based on health goals
+    const healthGoals = profile.healthGoals || [];
+    if (healthGoals.includes('Weight Loss')) {
+      target -= 300;
+    } else if (healthGoals.includes('Weight Gain') || healthGoals.includes('Muscle Building')) {
+      target += 300;
+    }
+
+    // Ensure reasonable bounds
+    return Math.max(1500, Math.min(3000, target));
   };
 
   const swapMeals = async (fromMealId: string, toMealId: string) => {

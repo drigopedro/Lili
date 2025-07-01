@@ -8,12 +8,16 @@ export interface UserProfile {
   lastName?: string;
   dateOfBirth?: string;
   gender?: 'male' | 'female' | 'other' | 'prefer-not-to-say';
+  ageRange?: '18-25' | '26-35' | '36-45' | '46-55' | '56-65' | '65+';
   heightCm?: number;
   weightKg?: number;
   activityLevel?: 'sedentary' | 'lightly-active' | 'moderately-active' | 'very-active' | 'extremely-active';
   healthGoals?: string[];
   dietaryRestrictions?: string[];
   medicalConditions?: string[];
+  allergies?: string[];
+  medications?: string[];
+  lifestyleFactors?: string[];
   onboardingCompleted?: boolean;
   createdAt?: string;
   updatedAt?: string;
@@ -61,12 +65,16 @@ export const useProfile = () => {
         lastName: data.last_name,
         dateOfBirth: data.date_of_birth,
         gender: data.gender,
+        ageRange: data.age_range,
         heightCm: data.height_cm,
         weightKg: data.weight_kg,
         activityLevel: data.activity_level,
         healthGoals: data.health_goals,
         dietaryRestrictions: data.dietary_restrictions,
         medicalConditions: data.medical_conditions,
+        allergies: data.allergies,
+        medications: data.medications,
+        lifestyleFactors: data.lifestyle_factors,
         onboardingCompleted: data.onboarding_completed,
         createdAt: data.created_at,
         updatedAt: data.updated_at,
@@ -108,12 +116,16 @@ export const useProfile = () => {
           lastName: data.last_name,
           dateOfBirth: data.date_of_birth,
           gender: data.gender,
+          ageRange: data.age_range,
           heightCm: data.height_cm,
           weightKg: data.weight_kg,
           activityLevel: data.activity_level,
           healthGoals: data.health_goals,
           dietaryRestrictions: data.dietary_restrictions,
           medicalConditions: data.medical_conditions,
+          allergies: data.allergies,
+          medications: data.medications,
+          lifestyleFactors: data.lifestyle_factors,
           onboardingCompleted: data.onboarding_completed,
           createdAt: data.created_at,
           updatedAt: data.updated_at,
@@ -136,12 +148,16 @@ export const useProfile = () => {
         last_name: updates.lastName,
         date_of_birth: updates.dateOfBirth,
         gender: updates.gender,
+        age_range: updates.ageRange,
         height_cm: updates.heightCm,
         weight_kg: updates.weightKg,
         activity_level: updates.activityLevel,
         health_goals: updates.healthGoals,
         dietary_restrictions: updates.dietaryRestrictions,
         medical_conditions: updates.medicalConditions,
+        allergies: updates.allergies,
+        medications: updates.medications,
+        lifestyle_factors: updates.lifestyleFactors,
         onboarding_completed: updates.onboardingCompleted,
         updated_at: new Date().toISOString(),
       };
@@ -161,12 +177,16 @@ export const useProfile = () => {
           lastName: data.last_name,
           dateOfBirth: data.date_of_birth,
           gender: data.gender,
+          ageRange: data.age_range,
           heightCm: data.height_cm,
           weightKg: data.weight_kg,
           activityLevel: data.activity_level,
           healthGoals: data.health_goals,
           dietaryRestrictions: data.dietary_restrictions,
           medicalConditions: data.medical_conditions,
+          allergies: data.allergies,
+          medications: data.medications,
+          lifestyleFactors: data.lifestyle_factors,
           onboardingCompleted: data.onboarding_completed,
           createdAt: data.created_at,
           updatedAt: data.updated_at,
